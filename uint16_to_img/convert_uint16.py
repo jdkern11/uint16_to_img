@@ -51,3 +51,4 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
         # the png writer.
         w_img = img.reshape(-1, img.shape[1]*img.shape[2]).tolist()
         writer.write(f, w_img)
+        logging.info('{} saved.'.format(save_name))
