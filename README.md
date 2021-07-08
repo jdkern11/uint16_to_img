@@ -7,9 +7,9 @@ If you use this for academic purposes please add me to your acknowledgments :-)
 
 ## Install
 ### pip install
-`pip install https://github.com/jdkern11/uint16_to_img.git`  
+`pip install git+https://github.com/jdkern11/uint16_to_img.git`  
 or  
-`pip install git@github.com/jdkern11/uint16_to_img.git`
+`pip install git+ssh://git@github.com/jdkern11/uint16_to_img.git`
 
 ### Anaconda install
 1. Install anaconda or miniconda
