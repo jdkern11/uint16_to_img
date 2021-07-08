@@ -59,7 +59,7 @@ files = [f for f in files if '.uint16' in f]
 
 # Want to save files in a separate folder
 my_img_folder = 'example_batch_img_folder'
-# Throws error if older already exists
+# Throws error if folder already exists
 try:
     os.mkdir(my_img_folder)
 except Exception as e:
