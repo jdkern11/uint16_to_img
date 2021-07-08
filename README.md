@@ -74,6 +74,13 @@ for f in files:
     file_path = os.path.join(batch_folder, f)
     conv16.convert(file_path, width=1456, height=1840, save_name=save_name)
 ```
+If you want to disable the logging messages, at the top of your script
+write
+```Python
+import logging
+logger = logging.getLogger()
+logger.disabled = True
+```
 
 ## FAQ
 ### What should I do if I have an error?
