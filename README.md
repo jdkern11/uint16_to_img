@@ -83,7 +83,7 @@ import logging
 logger = logging.getLogger()
 logger.disabled = True
 ```
-This will turn off all warning too, however. If you want to keep warnings, 
+This will turn off all warnings too, however. If you want to keep warnings, 
 change it to
 ```Python
 import logging
@@ -92,7 +92,7 @@ logger.setLevel(logging.WARNING)
 ```
 
 ### Checking pixel alterations
-If you want to ensure no pixels are altered (i.e., compressed or changed), you 
+If you want to ensure no pixels are altered (i.e., lost or changed), you 
 can run the following code:
 ```Python
 # If you want to save the file with a different name and image type, and check 
@@ -105,6 +105,12 @@ conv16.compare_file_to_img(my_file, 'test.tiff', width=1456,
         height=1840, depth=1)
 ```
 
+### Example scripts
+Example scripts and a data file are provided in the examples folder. You can
+run the example script by downloading the example folder, navigating to the
+folder in terminal, and typing  
+`python example_script.py`  
+If it runs, then the package is installed correctly.
 
 ## FAQ
 ### What should I do if I have an error?
