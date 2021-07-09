@@ -29,20 +29,22 @@ from uint16_to_img import convert_uint16 as conv16
 my_file = 'example.uint16'
 
 # I know my file widths are 1456 pixels and heights are 1840
-conv16.convert(my_file, width=1456, height=1840, depth=1)
+conv16.convert(my_file, width=1456, height=1840, depth=1, img_type='png')
 ```
 
 width is the width of your images in pixels, height the height in pixels,
 and depth the depth (if you have a colored image this will be 3, if you have
-a colored image with an alpha value, then it will be 4). Currntly only png
-images can be saved.
+a colored image with an alpha value, then it will be 4).
 
-If you want to control where the images are saved, you can use the save\_name
-parameter.
+If you want to control where the images are saved and the image type, 
+you can use the save\_name and img\_type parameters.
 ```Python
-# If you want to save the file with a different name
-conv16.convert(my_file, width=1456, height=1840, depth=1, save_name='test')
+# If you want to save the file with a different name and image type
+conv16.convert(my_file, width=1456, height=1840, depth=1, img_type='tiff',
+        save_name='test')
 ```
+
+The default img\_type is tiff.
 
 If you want to do batch processing, I would suggest putting all the related
 files in a separate folder, then running something like the following code:
@@ -73,13 +75,36 @@ for f in files:
     file_path = os.path.join(batch_folder, f)
     conv16.convert(file_path, width=1456, height=1840, save_name=save_name)
 ```
+### Turn off logging messages
 If you want to disable the logging messages, at the top of your script
-write
+write:
 ```Python
 import logging
 logger = logging.getLogger()
 logger.disabled = True
 ```
+This will turn off all warning too, however. If you want to keep warnings, 
+change it to
+```Python
+import logging
+logger = logging.getLogger()
+logger.setLevel(logging.WARNING)
+```
+
+### Checking pixel alterations
+If you want to ensure no pixels are altered (i.e., compressed or changed), you 
+can run the following code:
+```Python
+# If you want to save the file with a different name and image type, and check 
+# that no pixels are lost 
+conv16.convert(my_file, width=1456, height=1840, depth=1, img_type='tiff',
+        save_name='test', check_pixels=True)
+
+# Check if some pixels are lost in already created files
+conv16.compare_file_to_img(my_file, 'test.tiff', width=1456, 
+        height=1840, depth=1)
+```
+
 
 ## FAQ
 ### What should I do if I have an error?
@@ -87,6 +112,3 @@ Add it to the issues tab on github or email me
 
 ### I need help with a similar problem but a different file type
 You can email me
-
-### How do I make other image types?
-Currently only png images are supported

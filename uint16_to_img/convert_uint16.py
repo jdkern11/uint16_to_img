@@ -1,14 +1,15 @@
 import struct
 import os
+import sys
 import logging
 logging.basicConfig(level=logging.INFO)
 
 import numpy as np
-import png
+import cv2
 
 
 def convert(file_path: str, width: int, height: int, depth: int=1, 
-        img_type: str='png', save_name: str=None):
+        img_type: str='tiff', save_name: str=None, check_pixels: bool=False):
     """Converts uint16 files to images
 
     You must provide the accurate width, height and depth dimensions of the 
@@ -28,16 +29,21 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
         save_name (str):
             Optional. If None added, files save as the same name as the
             file_path, but as .tiff (or png, etc...) instead.
-            
+        check_pixels (bool):
+            Optional. If True, compare pixels of uint16 file and image and
+            give warning if they mismatch. Won't work if 
+            logging turned off. Default is False.
     """
-    if img_type != 'png':
-        logging.warning('Only png images supported currently, '
-                        + 'changing image type to png.')
-        img_type = 'png'
+    available_formats = ['png', 'tiff', 'jpg']
+    if not img_type in available_formats:
+        logging.warning('Only {} images supported currently, '.format(
+            available_formats) + 'changing image type to tiff.')
+        img_type = 'tiff'
+
+    # Get save name for different formats
     if save_name is None:
         save_name = os.path.splitext(file_path)[0]
-    save_name += ('.' + img_type)
-    logging.info('Saving file to ' + save_name)
+    names = {form: (save_name + '.' + form) for form in available_formats}
 
     fin = open(file_path, "rb")
     data = []
@@ -47,12 +53,75 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
     except Exception as e:
         pass
 
+    fin.close()
+    # unpack always creates a tuple
+    data = [c[0] for c in data]
+    img = np.uint16(np.array(data).reshape(height, width, depth))
+    cv2.imwrite(names[img_type], img)
+
+    if check_pixels:
+        compare_file_to_img(file_path, names[img_type], width, height, depth)
+
+def compare_file_to_img(file_path: str, img_path: str, width: int, 
+        height: int, depth: int=1):
+    """Compares pixels of image to original file to ensure no pixel loss
+    
+    Prints whether pixel loss occurred or not.
+
+    Args:
+        file_path (str):
+            Path to uint16 file
+        img_path (str):
+            Path to image file
+        width (int):
+            Width of image
+        height (int):
+            Height of image
+        depth (int):
+            Depth of image, default is 1
+    """
+    fin = open(file_path, "rb")
+    data = []
+    try:
+        while(True):
+            data.append(struct.unpack('H', fin.read(2)))
+    except Exception as e:
+        pass
+
+    fin.close()
+    # unpack always creates a tuple
     data = [c[0] for c in data]
     img = np.array(data).reshape(height, width, depth)
-    with open(save_name, 'wb') as f:
-        writer = png.Writer(width=img.shape[1], height=img.shape[0], bitdepth=16)
-        # Convert z to the Python list of lists expected by
-        # the png writer.
-        w_img = img.reshape(-1, img.shape[1]*img.shape[2]).tolist()
-        writer.write(f, w_img)
-        logging.info('{} saved.'.format(save_name))
+    image = np.uint16(cv2.imread(img_path, cv2.IMREAD_UNCHANGED))
+
+    pixel_loss = False
+    curr = 0
+    tot = width*height*depth
+    try:
+        if depth == 1:
+            for i in range(img.shape[0]):
+                for j in range(img.shape[1]):
+                    prog = 100*round(curr/tot, 3)
+                    curr += 1
+                    sys.stdout.write("\r%d%% done comparing file to image" % prog)
+                    sys.stdout.flush()
+                    if img[i][j][0] != image[i][j]:
+                        pixel_loss = True
+        else:
+            for i in range(img.shape[0]):
+                for j in range(img.shape[1]):
+                    for k in range(img.shape[2]):
+                        if img[i][j][k] != image[i][j][k]:
+                            prog = 100*round(curr/tot, 3)
+                            curr += 1
+                            sys.stdout.write("\r%d%% done comparing file to image" % prog)
+                            sys.stdout.flush()
+                            pixel_loss = True
+    except Exception as e:
+        print()
+        logging.warning('Error: {}'.format(e))
+    if pixel_loss:
+        print()
+        logging.warning("Pixel loss occurred")
+    print()
+    logging.info("No pixel loss occurred")
