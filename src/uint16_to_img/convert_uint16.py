@@ -25,7 +25,7 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
         depth (int):
             Depth of uint16 images
         img_type (str):
-            Optional. Type of image to create. Default is png.
+            Optional. Type of image to create. Default is tiff.
         save_name (str):
             Optional. If None added, files save as the same name as the
             file_path, but as .tiff (or png, etc...) instead.
