@@ -29,20 +29,19 @@ from uint16_to_img import convert_uint16 as conv16
 my_file = 'example.uint16'
 
 # I know my file widths are 1456 pixels and heights are 1840
-conv16.convert(my_file, width=1456, height=1840, depth=1, img_type='tiff')
+conv16.convert(my_file, width=1456, height=1840, depth=1)
 ```
 
 width is the width of your images in pixels, height the height in pixels,
 and depth the depth (if you have a colored image this will be 3, if you have
-a colored image with an alpha value, then it will be 4). img\_type is optional
-and defaults to tiff.
+a colored image with an alpha value, then it will be 4). Currntly only png
+images can be saved.
 
 If you want to control where the images are saved, you can use the save\_name
 parameter.
 ```Python
 # If you want to save the file with a different name
-conv16.convert(my_file, width=1456, height=1840, depth=1, img_type='tiff',
-               save_name='test')
+conv16.convert(my_file, width=1456, height=1840, depth=1, save_name='test')
 ```
 
 If you want to do batch processing, I would suggest putting all the related
@@ -88,3 +87,6 @@ Add it to the issues tab on github or email me
 
 ### I need help with a similar problem but a different file type
 You can email me
+
+### How do I make other image types?
+Currently only png images are supported

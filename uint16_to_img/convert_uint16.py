@@ -8,7 +8,7 @@ import png
 
 
 def convert(file_path: str, width: int, height: int, depth: int=1, 
-        img_type: str='tiff', save_name: str=None):
+        img_type: str='png', save_name: str=None):
     """Converts uint16 files to images
 
     You must provide the accurate width, height and depth dimensions of the 
@@ -24,12 +24,16 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
         depth (int):
             Depth of uint16 images
         img_type (str):
-            Optional. Type of image to create. Default is tiff.
+            Optional. Type of image to create. Default is png.
         save_name (str):
             Optional. If None added, files save as the same name as the
             file_path, but as .tiff (or png, etc...) instead.
             
     """
+    if img_type != 'png':
+        logging.warning('Only png images supported currently, '
+                        + 'changing image type to png.')
+        img_type = 'png'
     if save_name is None:
         save_name = os.path.splitext(file_path)[0]
     save_name += ('.' + img_type)
