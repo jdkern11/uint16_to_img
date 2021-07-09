@@ -63,7 +63,7 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
     data = [c[0] for c in data]
     img = np.uint16(np.array(data).reshape(height, width, depth))
     cv2.imwrite(names[img_type], img)
-    logging.info('Saved {}'.format(names[img_type])
+    logging.info('Saved {}'.format(names[img_type]))
 
     if check_pixels:
         logging.info('Checking for pixel alterations'.format(names[img_type])
