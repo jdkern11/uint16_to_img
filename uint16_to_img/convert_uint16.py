@@ -46,6 +46,7 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
     names = {form: (save_name + '.' + form) for form in available_formats}
 
     tot = width*height*depth
+    curr = 0
     fin = open(file_path, "rb")
     data = []
     try:
@@ -90,6 +91,7 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
     fin = open(file_path, "rb")
     data = []
     tot = width*height*depth
+    curr = 0
     try:
         while(True):
             data.append(struct.unpack('H', fin.read(2)))
@@ -108,7 +110,6 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
     image = np.uint16(cv2.imread(img_path, cv2.IMREAD_UNCHANGED))
 
     pixel_loss = False
-    curr = 0
     try:
         if depth == 1:
             for i in range(img.shape[0]):
