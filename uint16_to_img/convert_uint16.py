@@ -45,11 +45,16 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
         save_name = os.path.splitext(file_path)[0]
     names = {form: (save_name + '.' + form) for form in available_formats}
 
+    tot = width*height*depth
     fin = open(file_path, "rb")
     data = []
     try:
         while(True):
             data.append(struct.unpack('H', fin.read(2)))
+            prog = 100*round(curr/tot, 3)
+            curr += 1
+            sys.stdout.write("\r%d%% done loading file" % prog)
+            sys.stdout.flush()
     except Exception as e:
         pass
 
@@ -58,15 +63,17 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
     data = [c[0] for c in data]
     img = np.uint16(np.array(data).reshape(height, width, depth))
     cv2.imwrite(names[img_type], img)
+    logging.info('Saved {}'.format(names[img_type])
 
     if check_pixels:
+        logging.info('Checking for pixel alterations'.format(names[img_type])
         compare_file_to_img(file_path, names[img_type], width, height, depth)
 
 def compare_file_to_img(file_path: str, img_path: str, width: int, 
         height: int, depth: int=1):
-    """Compares pixels of image to original file to ensure no pixel loss
+    """Compares pixels of image to original file to ensure no pixel change
     
-    Prints whether pixel loss occurred or not.
+    Prints whether pixel change occurred or not.
 
     Args:
         file_path (str):
@@ -82,12 +89,18 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
     """
     fin = open(file_path, "rb")
     data = []
+    tot = width*height*depth
     try:
         while(True):
             data.append(struct.unpack('H', fin.read(2)))
+            prog = 100*round(curr/tot, 3)
+            curr += 1
+            sys.stdout.write("\r%d%% done loading file" % prog)
+            sys.stdout.flush()
     except Exception as e:
         pass
 
+    print()
     fin.close()
     # unpack always creates a tuple
     data = [c[0] for c in data]
@@ -96,7 +109,6 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
 
     pixel_loss = False
     curr = 0
-    tot = width*height*depth
     try:
         if depth == 1:
             for i in range(img.shape[0]):
@@ -122,6 +134,6 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
         logging.warning('Error: {}'.format(e))
     if pixel_loss:
         print()
-        logging.warning("Pixel loss occurred")
+        logging.warning("Pixel alteration occurred")
     print()
-    logging.info("No pixel loss occurred")
+    logging.info("No pixel alteration occurred")
