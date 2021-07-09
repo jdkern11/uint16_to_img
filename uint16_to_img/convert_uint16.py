@@ -66,7 +66,7 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
     logging.info('Saved {}'.format(names[img_type]))
 
     if check_pixels:
-        logging.info('Checking for pixel alterations'.format(names[img_type])
+        logging.info('Checking for pixel alterations'.format(names[img_type]))
         compare_file_to_img(file_path, names[img_type], width, height, depth)
 
 def compare_file_to_img(file_path: str, img_path: str, width: int, 
