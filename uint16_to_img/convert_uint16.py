@@ -56,9 +56,19 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
             curr += 1
             sys.stdout.write("\r%d%% done loading file" % prog)
             sys.stdout.flush()
+            if curr > tot:
+                print()
+                logging.warning('Returning, as file larger than expected. '
+                         + 'Check to ensure image width, height and depth are '
+                         + 'correct.')
+                return
     except Exception as e:
-        pass
-    print()
+        print()
+        if curr < tot:
+            logging.warning('Returning, as file smaller than expected. '
+                     + 'Check to ensure image width, height and depth are '
+                     + 'correct.')
+            return
     fin.close()
     # unpack always creates a tuple
     data = [c[0] for c in data]
@@ -67,7 +77,6 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
     logging.info('Saved {}'.format(names[img_type]))
 
     if check_pixels:
-        logging.info('Checking for pixel alterations'.format(names[img_type]))
         compare_file_to_img(file_path, names[img_type], width, height, depth)
 
 def compare_file_to_img(file_path: str, img_path: str, width: int, 
@@ -88,6 +97,9 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
         depth (int):
             Depth of image, default is 1
     """
+    logging.info('Checking for pixel alterations between {} and {}'.format(
+        file_path, img_path)
+    )
     fin = open(file_path, "rb")
     data = []
     tot = width*height*depth
@@ -99,9 +111,19 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
             curr += 1
             sys.stdout.write("\r%d%% done loading file" % prog)
             sys.stdout.flush()
+            if curr > tot:
+                print()
+                logging.warning('Returning, as file larger than expected. '
+                         + 'Check to ensure image width, height and depth are '
+                         + 'correct.')
+                return
     except Exception as e:
-        pass
-    print()
+        print()
+        if curr < tot:
+            logging.warning('Returning, as file smaller than expected. '
+                     + 'Check to ensure image width, height and depth are '
+                     + 'correct.')
+            return
     fin.close()
     # unpack always creates a tuple
     data = [c[0] for c in data]
@@ -109,6 +131,7 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
     image = np.uint16(cv2.imread(img_path, cv2.IMREAD_UNCHANGED))
 
     pixel_loss = False
+    curr = 0
     try:
         if depth == 1:
             for i in range(img.shape[0]):
