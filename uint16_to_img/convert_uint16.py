@@ -58,7 +58,7 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
             sys.stdout.flush()
     except Exception as e:
         pass
-
+    print()
     fin.close()
     # unpack always creates a tuple
     data = [c[0] for c in data]
@@ -101,7 +101,6 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
             sys.stdout.flush()
     except Exception as e:
         pass
-
     print()
     fin.close()
     # unpack always creates a tuple
