@@ -1,4 +1,5 @@
-from uint16_to_img import convert_uint16 as conv16
+#from uint16_to_img import convert_uint16 as conv16
+import convert_uint16 as conv16
 
 # My script is in the folder with my image, so I don't have to give the 
 # exact path to the folder
