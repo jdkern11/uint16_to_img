@@ -45,33 +45,25 @@ def convert(file_path: str, width: int, height: int, depth: int=1,
         save_name = os.path.splitext(file_path)[0]
     names = {form: (save_name + '.' + form) for form in available_formats}
 
+    # Convert file to image
+    with open(file_path, "rb") as fin:
+        data = fin.read()
+    format = '{:d}H'.format(len(data)//2)
+    data = struct.unpack(format, data)
+    # Ensure data size matches what is expected
     tot = width*height*depth
-    curr = 0
-    fin = open(file_path, "rb")
-    data = []
-    try:
-        while(True):
-            data.append(struct.unpack('H', fin.read(2)))
-            prog = 100*round(curr/tot, 3)
-            curr += 1
-            sys.stdout.write("\r%d%% done loading file" % prog)
-            sys.stdout.flush()
-            if curr > tot:
-                print()
-                logging.warning('Returning, as file larger than expected. '
-                         + 'Check to ensure image width, height and depth are '
-                         + 'correct.')
-                return
-    except Exception as e:
+    if len(data) > tot:
         print()
-        if curr < tot:
-            logging.warning('Returning, as file smaller than expected. '
-                     + 'Check to ensure image width, height and depth are '
-                     + 'correct.')
-            return
-    fin.close()
-    # unpack always creates a tuple
-    data = [c[0] for c in data]
+        logging.warning('Returning, as file larger than expected. '
+                 + 'Check to ensure image width, height and depth are '
+                 + 'correct.')
+        return
+    if len(data) < tot:
+        logging.warning('Returning, as file smaller than expected. '
+                 + 'Check to ensure image width, height and depth are '
+                 + 'correct.')
+        return
+
     img = np.uint16(np.array(data).reshape(height, width, depth))
     cv2.imwrite(names[img_type], img)
     logging.info('Saved {}'.format(names[img_type]))
@@ -100,33 +92,26 @@ def compare_file_to_img(file_path: str, img_path: str, width: int,
     logging.info('Checking for pixel alterations between {} and {}'.format(
         file_path, img_path)
     )
-    fin = open(file_path, "rb")
-    data = []
+
+    # Convert file to image
+    with open(file_path, "rb") as fin:
+        data = fin.read()
+    format = '{:d}H'.format(len(data)//2)
+    data = struct.unpack(format, data)
+    # Ensure data size matches what is expected
     tot = width*height*depth
-    curr = 0
-    try:
-        while(True):
-            data.append(struct.unpack('H', fin.read(2)))
-            prog = 100*round(curr/tot, 3)
-            curr += 1
-            sys.stdout.write("\r%d%% done loading file" % prog)
-            sys.stdout.flush()
-            if curr > tot:
-                print()
-                logging.warning('Returning, as file larger than expected. '
-                         + 'Check to ensure image width, height and depth are '
-                         + 'correct.')
-                return
-    except Exception as e:
+    if len(data) > tot:
         print()
-        if curr < tot:
-            logging.warning('Returning, as file smaller than expected. '
-                     + 'Check to ensure image width, height and depth are '
-                     + 'correct.')
-            return
-    fin.close()
-    # unpack always creates a tuple
-    data = [c[0] for c in data]
+        logging.warning('Returning, as file larger than expected. '
+                 + 'Check to ensure image width, height and depth are '
+                 + 'correct.')
+        return
+    if len(data) < tot:
+        logging.warning('Returning, as file smaller than expected. '
+                 + 'Check to ensure image width, height and depth are '
+                 + 'correct.')
+        return
+
     img = np.array(data).reshape(height, width, depth)
     image = np.uint16(cv2.imread(img_path, cv2.IMREAD_UNCHANGED))
 
